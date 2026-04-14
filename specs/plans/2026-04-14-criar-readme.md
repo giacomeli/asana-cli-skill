@@ -24,5 +24,5 @@ Task: [Criar Readme.md](https://app.asana.com/1/1199546431596919/project/1207037
 
 | Step | Subtask | Asana ID | Status | Commit |
 |------|---------|----------|--------|--------|
-| 1 | Documentar o funcionamento do CLI | 1214067279487935 | ⏳ | — |
+| 1 | Documentar o funcionamento do CLI | 1214067279487935 | ✅ | 11552c5 |
 | 2 | Criar um claude.md para facilitar no desenvolvimento | 1214067279487936 | ⏳ | — |
