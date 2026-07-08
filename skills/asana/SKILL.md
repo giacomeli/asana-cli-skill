@@ -19,8 +19,7 @@ Orchestrates the development workflow from an Asana task: reads the task, genera
 The `asana-cli` command must be installed globally.
 If `asana-cli` is not found, instruct the user:
 ```
-git clone https://github.com/giacomeli/asana-cli-skill.git
-cd asana-cli-skill && npm install && npm link
+npm install -g asana-cli-skill
 asana-cli init
 ```
 

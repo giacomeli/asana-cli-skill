@@ -4,9 +4,23 @@
   "description": "Minimal CLI for Asana task management, built to power a Claude Code skill",
   "type": "module",
   "license": "MIT",
+  "author": "Juliano Giacomeli",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/giacomeli/asana-cli-skill.git"
+  },
+  "homepage": "https://github.com/giacomeli/asana-cli-skill#readme",
+  "bugs": {
+    "url": "https://github.com/giacomeli/asana-cli-skill/issues"
+  },
   "bin": {
     "asana-cli": "./bin/asana-cli.js"
   },
+  "files": [
+    "bin",
+    "src",
+    "skills"
+  ],
   "scripts": {
     "start": "node bin/asana-cli.js"
   },
@@ -17,7 +31,8 @@
     "asana",
     "cli",
     "claude-code",
-    "skill"
+    "skill",
+    "task-management"
   ],
   "dependencies": {
     "chalk": "^5.4.1",
