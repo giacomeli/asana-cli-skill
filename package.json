@@ -1,14 +1,24 @@
 {
   "name": "asana-cli-skill",
   "version": "1.0.0",
-  "description": "CLI minimalista para integração com Asana, usado pela skill do Claude Code",
+  "description": "Minimal CLI for Asana task management, built to power a Claude Code skill",
   "type": "module",
+  "license": "MIT",
   "bin": {
     "asana-cli": "./bin/asana-cli.js"
   },
   "scripts": {
     "start": "node bin/asana-cli.js"
   },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "asana",
+    "cli",
+    "claude-code",
+    "skill"
+  ],
   "dependencies": {
     "chalk": "^5.4.1",
     "commander": "^13.1.0",
