@@ -18,25 +18,25 @@ function prompt(question) {
 }
 
 export async function initCommand() {
-    console.log('\n🔧 Configuração do Asana CLI\n');
+    console.log('\nAsana CLI setup\n');
 
     if (existsSync(ENV_PATH)) {
-        const overwrite = await prompt('   Já existe uma configuração. Sobrescrever? (s/N): ');
-        if (overwrite.toLowerCase() !== 's') {
-            console.log(formatSuccess('Configuração mantida.'));
+        const overwrite = await prompt('   A configuration already exists. Overwrite? (y/N): ');
+        if (overwrite.toLowerCase() !== 'y') {
+            console.log(formatSuccess('Existing configuration kept.'));
             return;
         }
     }
 
-    const token = await prompt('   Cole seu Personal Access Token do Asana: ');
+    const token = await prompt('   Paste your Asana Personal Access Token: ');
 
     if (!token) {
-        console.log(formatError('Token não pode ser vazio.'));
+        console.log(formatError('Token cannot be empty.'));
         process.exit(1);
     }
 
     mkdirSync(CONFIG_DIR, { recursive: true });
     writeFileSync(ENV_PATH, `ASANA_TOKEN=${token}\n`, { mode: 0o600 });
 
-    console.log(formatSuccess(`Token salvo em ${ENV_PATH}`));
+    console.log(formatSuccess(`Token saved to ${ENV_PATH}`));
 }

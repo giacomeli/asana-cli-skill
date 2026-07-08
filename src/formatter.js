@@ -4,12 +4,12 @@ export function formatTask(task, subtasks) {
     const lines = [];
 
     lines.push('');
-    lines.push(chalk.bold(`📋 Task: ${task.name}`));
-    lines.push(`   Status: ${task.completed ? chalk.green('Concluída') : chalk.yellow('Em andamento')}`);
+    lines.push(chalk.bold(`Task: ${task.name}`));
+    lines.push(`   Status: ${task.completed ? chalk.green('Completed') : chalk.yellow('In progress')}`);
 
     const project = task.memberships?.[0]?.project?.name;
     if (project) {
-        lines.push(`   Projeto: ${project}`);
+        lines.push(`   Project: ${project}`);
     }
 
     if (task.assignee?.name) {
@@ -20,7 +20,7 @@ export function formatTask(task, subtasks) {
 
     if (task.notes) {
         lines.push('');
-        lines.push('   Descrição:');
+        lines.push('   Description:');
         const noteLines = task.notes.split('\n');
         for (const line of noteLines) {
             lines.push(`   ${line}`);
@@ -31,7 +31,7 @@ export function formatTask(task, subtasks) {
         lines.push('');
         lines.push(`   Subtasks (${subtasks.length}):`);
         for (const sub of subtasks) {
-            const check = sub.completed ? chalk.green('✓') : ' ';
+            const check = sub.completed ? chalk.green('x') : ' ';
             const name = sub.completed ? chalk.dim(sub.name) : sub.name;
             lines.push(`   [${check}] ${name} (id: ${sub.gid})`);
         }
@@ -46,14 +46,14 @@ export function formatSubtasks(subtasks) {
     lines.push('');
 
     if (subtasks.length === 0) {
-        lines.push(chalk.dim('   Nenhuma subtask encontrada.'));
+        lines.push(chalk.dim('   No subtasks found.'));
         lines.push('');
         return lines.join('\n');
     }
 
     lines.push(`   Subtasks (${subtasks.length}):`);
     for (const sub of subtasks) {
-        const check = sub.completed ? chalk.green('✓') : ' ';
+        const check = sub.completed ? chalk.green('x') : ' ';
         const name = sub.completed ? chalk.dim(sub.name) : sub.name;
         lines.push(`   [${check}] ${name} (id: ${sub.gid})`);
     }
@@ -63,9 +63,9 @@ export function formatSubtasks(subtasks) {
 }
 
 export function formatSuccess(message) {
-    return `\n${chalk.green('✅')} ${message}\n`;
+    return `\n${chalk.green('OK')} ${message}\n`;
 }
 
 export function formatError(message) {
-    return `\n${chalk.red('❌')} ${message}\n`;
+    return `\n${chalk.red('Error:')} ${message}\n`;
 }

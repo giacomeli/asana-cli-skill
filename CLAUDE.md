@@ -1,80 +1,86 @@
 # CLAUDE.md
 
-Orientações para o Claude Code ao trabalhar neste repositório.
+Guidance for Claude Code when working in this repository.
 
-## O que é este projeto
+## What this project is
 
-CLI Node.js minimalista que faz CRUD na API do Asana. Foi criado para ser usado pela skill `asana` do Claude Code (`~/.claude/skills/asana/SKILL.md`), mas funciona independentemente no terminal.
+Minimal Node.js CLI that performs CRUD against the Asana API. It was built to be used by the `asana` Claude Code skill (`skills/asana/SKILL.md` in this repo, installed to `~/.claude/skills/asana/`), but works standalone in the terminal.
 
-O CLI é a camada de infraestrutura — toda lógica de orquestração (ler task, gerar plano, executar steps) vive na skill, não aqui.
+The CLI is the infrastructure layer — all orchestration logic (read task, generate plan, execute steps) lives in the skill, not here.
 
-## Comandos
+## Commands
 
 ```bash
-node bin/asana-cli.js task <url>                    # Ler task
-node bin/asana-cli.js subtasks <url-ou-id>          # Listar subtasks
-node bin/asana-cli.js complete <id> -m "msg"        # Completar + comentar
-node bin/asana-cli.js comment <id> -m "msg"         # Comentar
-node bin/asana-cli.js create-subtask <id> -n "nome" # Criar subtask
-node bin/asana-cli.js init                          # Configurar token
+node bin/asana-cli.js task <url>                    # Read a task
+node bin/asana-cli.js subtasks <url-or-id>          # List subtasks
+node bin/asana-cli.js complete <id> -m "msg"        # Complete + comment
+node bin/asana-cli.js comment <id> -m "msg"         # Comment
+node bin/asana-cli.js create-subtask <id> -n "name" # Create a subtask
+node bin/asana-cli.js init                          # Configure token
 ```
 
-Se instalado globalmente (`npm link`), usar `asana-cli` ao invés de `node bin/asana-cli.js`.
+If installed globally (`npm link`), use `asana-cli` instead of `node bin/asana-cli.js`.
 
 ## Stack
 
-- Node.js com ESM nativo (sem build step, sem TypeScript)
-- `commander` para parsing de CLI
-- `chalk` para cores
-- `dotenv` para configuração
-- `fetch` nativo (Node 18+)
+- Node.js with native ESM (no build step, no TypeScript)
+- `commander` for CLI parsing
+- `chalk` for colors
+- `dotenv` for configuration
+- Native `fetch` (Node 18+)
 
-## Estrutura
+## Structure
 
 ```
-bin/asana-cli.js              # Entry point, registro de comandos
+bin/asana-cli.js              # Entry point, command registration
 src/
-  client.js                   # AsanaClient — wrapper HTTP sobre a API REST do Asana
-  formatter.js                # Formatação human-readable para terminal
-  utils.js                    # parseTaskId — extrai ID de URLs do Asana
+  client.js                   # AsanaClient — HTTP wrapper over the Asana REST API
+  formatter.js                # Human-readable terminal output
+  utils.js                    # parseTaskId — extracts IDs from Asana URLs
   commands/
-    init.js                   # Configuração interativa do token
-    task.js                   # Comando: ler task completa
-    subtasks.js               # Comando: listar subtasks
-    complete.js               # Comando: completar task + comentário
-    comment.js                # Comando: adicionar comentário
-    create-subtask.js         # Comando: criar subtask
+    init.js                   # Interactive token setup
+    task.js                   # Command: read a full task
+    subtasks.js               # Command: list subtasks
+    complete.js               # Command: complete a task + comment
+    comment.js                # Command: add a comment
+    create-subtask.js         # Command: create a subtask
+skills/
+  asana/SKILL.md              # Claude Code skill that orchestrates the workflow
 ```
 
-## Convenções
+## Conventions
 
-- **Sem build step.** Código roda direto com `node`, ESM nativo.
-- **Sem TypeScript.** Manter simples — é um CLI pequeno.
-- **Dependências mínimas.** Não adicionar axios, node-fetch ou frameworks pesados. Usar `fetch` nativo.
-- **Saída human-readable.** O output do CLI é feito para ser lido por humanos e colado em planos/docs.
-- **`\n` literal.** O `client.js` converte `\n` literal em quebras de linha reais antes de enviar pra API do Asana.
+- **No build step.** Code runs directly with `node`, native ESM.
+- **No TypeScript.** Keep it simple — it is a small CLI.
+- **Minimal dependencies.** Do not add axios, node-fetch, or heavy frameworks. Use native `fetch`.
+- **Human-readable output.** CLI output is meant to be read by humans and pasted into plans/docs.
+- **Literal `\n`.** `client.js` converts literal `\n` into real line breaks before sending to the Asana API.
+- **No emojis.** Not in output, code, docs, or commits.
 
-## Autenticação
+## Authentication
 
-O token (Personal Access Token) é carregado de:
-1. `.env` no diretório atual (prioridade)
-2. `~/.asana-cli/.env` (fallback global)
+The token (Personal Access Token) is loaded from:
+1. `.env` in the current directory (takes precedence)
+2. `~/.asana-cli/.env` (global fallback)
 
-Variável: `ASANA_TOKEN`
+Variables:
+- `ASANA_TOKEN` — required.
+- `ASANA_PROGRESS_FIELD` / `ASANA_PROGRESS_VALUE` — optional. When both are set, `complete` sets this enum custom field instead of the completed checkbox (the `--close` flag still checks the task off).
 
-## API do Asana
+## Asana API
 
 Base URL: `https://app.asana.com/api/1.0`
 
-Endpoints usados:
-- `GET /tasks/{id}` — ler task
-- `GET /tasks/{id}/subtasks` — listar subtasks
-- `PUT /tasks/{id}` — atualizar task (completar)
-- `POST /tasks/{id}/stories` — adicionar comentário
-- `POST /tasks/{id}/subtasks` — criar subtask
+Endpoints used:
+- `GET /tasks/{id}` — read a task
+- `GET /tasks/{id}/subtasks` — list subtasks
+- `PUT /tasks/{id}` — update a task (complete, custom fields)
+- `POST /tasks/{id}/stories` — add a comment
+- `POST /tasks/{id}/attachments` — upload an attachment
+- `POST /tasks/{id}/subtasks` — create a subtask
 
-Documentação: https://developers.asana.com/reference
+Documentation: https://developers.asana.com/reference
 
-## Idioma
+## Language
 
-Português (pt-BR) para mensagens de erro, output e commits.
+English for error messages, CLI output, and documentation. Commit messages follow Conventional Commits in pt-BR.

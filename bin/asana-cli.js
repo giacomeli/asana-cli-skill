@@ -14,7 +14,7 @@ import { commentCommand } from '../src/commands/comment.js';
 import { createSubtaskCommand } from '../src/commands/create-subtask.js';
 import { formatError } from '../src/formatter.js';
 
-// Carrega .env do diretório do projeto primeiro, depois do ~/.asana-cli/
+// Load .env from the current directory first, then from ~/.asana-cli/
 config({ path: join(process.cwd(), '.env') });
 
 const globalEnv = join(homedir(), '.asana-cli', '.env');
@@ -26,57 +26,63 @@ function getClient() {
     return new AsanaClient(process.env.ASANA_TOKEN);
 }
 
+function collectMultiple(value, prev) {
+    return prev.concat([value]);
+}
+
 const program = new Command();
 
 program
     .name('asana-cli')
-    .description('CLI para integração com Asana')
+    .description('Minimal CLI for Asana task management')
     .version('1.0.0');
 
 program
     .command('init')
-    .description('Configurar Personal Access Token do Asana')
+    .description('Configure your Asana Personal Access Token')
     .action(initCommand);
 
 program
     .command('task')
-    .description('Ler task completa com subtasks')
-    .argument('<url-ou-id>', 'URL do Asana ou task ID')
+    .description('Read a full task with its subtasks')
+    .argument('<url-or-id>', 'Asana URL or task ID')
     .action(async (urlOrId) => {
         await taskCommand(urlOrId, getClient());
     });
 
 program
     .command('subtasks')
-    .description('Listar subtasks de uma task')
-    .argument('<url-ou-id>', 'URL do Asana ou task ID')
+    .description('List the subtasks of a task')
+    .argument('<url-or-id>', 'Asana URL or task ID')
     .action(async (urlOrId) => {
         await subtasksCommand(urlOrId, getClient());
     });
 
 program
     .command('complete')
-    .description('Marcar task como concluída com comentário')
-    .argument('<task-id>', 'ID da task')
-    .requiredOption('-m, --message <texto>', 'Mensagem do comentário')
+    .description('Mark a task as done with a comment (custom progress field or completed checkbox)')
+    .argument('<task-id>', 'Task ID')
+    .requiredOption('-m, --message <text>', 'Comment message')
+    .option('--close', 'Also mark the task as completed (checkbox), including pending subtasks')
     .action(async (taskId, options) => {
         await completeCommand(taskId, options, getClient());
     });
 
 program
     .command('comment')
-    .description('Adicionar comentário em uma task')
-    .argument('<task-id>', 'ID da task')
-    .requiredOption('-m, --message <texto>', 'Mensagem do comentário')
+    .description('Add a comment and/or attachments to a task')
+    .argument('<task-id>', 'Task ID')
+    .option('-m, --message <text>', 'Comment message')
+    .option('-a, --attachment <path>', 'File to attach (repeatable)', collectMultiple, [])
     .action(async (taskId, options) => {
         await commentCommand(taskId, options, getClient());
     });
 
 program
     .command('create-subtask')
-    .description('Criar subtask em uma task')
-    .argument('<parent-id>', 'ID da task pai')
-    .requiredOption('-n, --name <nome>', 'Nome da subtask')
+    .description('Create a subtask under a task')
+    .argument('<parent-id>', 'Parent task ID')
+    .requiredOption('-n, --name <name>', 'Subtask name')
     .action(async (parentId, options) => {
         await createSubtaskCommand(parentId, options, getClient());
     });

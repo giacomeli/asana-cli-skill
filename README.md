@@ -1,132 +1,177 @@
 # asana-cli
 
-CLI minimalista para integração com o Asana. Desenvolvido para ser usado pela skill `asana` do Claude Code, mas funciona independentemente no terminal.
+Minimal CLI for Asana task management. Built to power the `asana` skill for [Claude Code](https://claude.com/claude-code), but works standalone in any terminal.
 
-## Instalação
+The CLI is a thin infrastructure layer over the Asana REST API. All orchestration logic (reading a task, generating a plan, executing steps, reporting progress) lives in the skill — see [The Claude Code skill](#the-claude-code-skill).
+
+## Installation
 
 ```bash
-cd ~/Projects/asana-cli-skill
+git clone https://github.com/giacomeli/asana-cli-skill.git
+cd asana-cli-skill
 npm install
 npm link
 ```
 
-Isso disponibiliza o comando `asana-cli` globalmente.
+This makes the `asana-cli` command available globally.
 
-## Configuração
+Requires Node.js 18+ (native `fetch`).
 
-### Opção 1: Comando interativo
+## Configuration
+
+### Option 1: Interactive command
 
 ```bash
 asana-cli init
 ```
 
-Solicita o Personal Access Token e salva em `~/.asana-cli/.env`.
+Prompts for your Personal Access Token and saves it to `~/.asana-cli/.env`.
 
-### Opção 2: Manual
+### Option 2: Manual
 
-Crie o arquivo `~/.asana-cli/.env`:
+Create `~/.asana-cli/.env` (or a `.env` in your working directory):
 
 ```
-ASANA_TOKEN=seu-token-aqui
+ASANA_TOKEN=your-token-here
 ```
 
-O token pode ser gerado em: Asana > Settings > Apps > Developer > Personal Access Tokens.
+You can generate a token at: Asana > Settings > Apps > Developer > Personal Access Tokens.
 
-## Comandos
+### Optional: progress custom field
 
-### `asana-cli task <url-ou-id>`
+By default, `asana-cli complete` marks the task as completed (the Asana checkbox). If your workspace tracks progress with an enum custom field instead (common on board-style projects), configure it:
 
-Lê uma task completa com título, descrição, projeto, assignee e subtasks.
+```
+ASANA_PROGRESS_FIELD=Task Progress
+ASANA_PROGRESS_VALUE=Done
+```
+
+With these set, `complete` sets the custom field to that value instead of checking the task off. Use `--close` to also check it off.
+
+## Commands
+
+### `asana-cli task <url-or-id>`
+
+Reads a full task: title, description, project, assignee, and subtasks.
 
 ```bash
 asana-cli task https://app.asana.com/0/1234/5678
 ```
 
-Saída:
+Output:
 
 ```
-📋 Task: Implementar sistema de notificações
-   Status: Em andamento
-   Projeto: Sprint 42
+Task: Implement notification system
+   Status: In progress
+   Project: Sprint 42
    Assignee: Juliano
    ID: 5678
 
-   Descrição:
-   Criar sistema de notificações push...
+   Description:
+   Build a push notification system...
 
    Subtasks (2):
-   [ ] Criar schema (id: 9012)
-   [✓] Definir endpoints (id: 9013)
+   [ ] Create schema (id: 9012)
+   [x] Define endpoints (id: 9013)
 ```
 
-### `asana-cli subtasks <url-ou-id>`
+### `asana-cli subtasks <url-or-id>`
 
-Lista apenas as subtasks de uma task.
+Lists only the subtasks of a task.
 
 ```bash
 asana-cli subtasks 5678
 ```
 
-### `asana-cli complete <task-id> -m "mensagem"`
+### `asana-cli complete <task-id> -m "message"`
 
-Adiciona um comentário na task e marca como concluída.
-
-```bash
-asana-cli complete 9012 -m "✅ Concluído\n\nSchema criado com validação Zod\n\nCommit: abc1234\nBranch: feature/notificacoes"
-```
-
-Quebras de linha (`\n`) são convertidas automaticamente.
-
-### `asana-cli comment <task-id> -m "mensagem"`
-
-Adiciona um comentário sem alterar o status.
+Adds a comment and marks the task as done (completed checkbox, or the configured progress custom field).
 
 ```bash
-asana-cli comment 5678 -m "🎯 Task concluída\n\nResumo dos commits..."
+asana-cli complete 9012 -m "Done\n\nSchema created with Zod validation\n\nCommit: abc1234\nBranch: feature/notifications"
 ```
 
-### `asana-cli create-subtask <parent-id> -n "nome"`
+Literal `\n` sequences are converted to real line breaks automatically.
 
-Cria uma nova subtask em uma task.
+Flags:
+
+- `--close` — also mark the task as completed (checkbox) and complete any pending subtasks. Useful when a progress custom field is configured and you want both.
+
+### `asana-cli comment <task-id> -m "message"`
+
+Adds a comment without changing the task status.
 
 ```bash
-asana-cli create-subtask 5678 -n "Implementar componente de toast"
+asana-cli comment 5678 -m "Task completed\n\nCommit summary..."
 ```
 
-## Formatos de URL aceitos
+Attach files (repeatable, images are embedded inline):
 
-O CLI aceita qualquer um destes formatos:
+```bash
+asana-cli comment 5678 -m "Screenshots attached" -a screenshot1.png -a screenshot2.png
+```
+
+### `asana-cli create-subtask <parent-id> -n "name"`
+
+Creates a new subtask under a task.
+
+```bash
+asana-cli create-subtask 5678 -n "Implement toast component"
+```
+
+## Accepted URL formats
+
+The CLI accepts any of these:
 
 - `https://app.asana.com/0/<project-id>/<task-id>`
 - `https://app.asana.com/0/<project-id>/<task-id>/f`
 - `https://app.asana.com/1/<workspace-id>/project/<project-id>/task/<task-id>`
-- ID numérico direto (ex: `1234567890`)
+- Plain numeric ID (e.g. `1234567890`)
 
-## Estrutura do projeto
+## The Claude Code skill
+
+The `skills/asana/` directory contains a Claude Code skill that orchestrates a full development workflow on top of this CLI: it reads an Asana task, builds an implementation plan from its subtasks (creating them if missing), executes step by step, and updates Asana with comments, commit hashes, and status as the work progresses.
+
+To install it, copy (or symlink) the skill into your Claude Code skills directory:
+
+```bash
+cp -r skills/asana ~/.claude/skills/asana
+```
+
+Then share any Asana task link in a Claude Code conversation, or use `/asana`.
+
+## Project structure
 
 ```
 asana-cli-skill/
 ├── bin/
-│   └── asana-cli.js          # Entry point
+│   └── asana-cli.js          # Entry point, command registration
 ├── src/
-│   ├── client.js             # Client HTTP para API do Asana
-│   ├── formatter.js          # Formatação human-readable
-│   ├── utils.js              # Parse de URL, helpers
+│   ├── client.js             # HTTP client for the Asana API
+│   ├── formatter.js          # Human-readable terminal output
+│   ├── utils.js              # URL parsing, helpers
 │   └── commands/
-│       ├── init.js            # Configuração do token
-│       ├── task.js            # Ler task
-│       ├── subtasks.js        # Listar subtasks
-│       ├── complete.js        # Completar + comentar
-│       ├── comment.js         # Comentar
-│       └── create-subtask.js  # Criar subtask
+│       ├── init.js            # Token setup
+│       ├── task.js            # Read a task
+│       ├── subtasks.js        # List subtasks
+│       ├── complete.js        # Complete + comment
+│       ├── comment.js         # Comment
+│       └── create-subtask.js  # Create a subtask
+├── skills/
+│   └── asana/
+│       └── SKILL.md          # Claude Code skill
 ├── package.json
 └── .gitignore
 ```
 
 ## Stack
 
-- Node.js (ESM nativo, sem build step)
-- `commander` para parsing de argumentos
-- `chalk` para cores no terminal
-- `dotenv` para configuração
-- `fetch` nativo (Node 18+)
+- Node.js (native ESM, no build step)
+- `commander` for argument parsing
+- `chalk` for terminal colors
+- `dotenv` for configuration
+- Native `fetch` (Node 18+)
+
+## License
+
+[MIT](LICENSE)

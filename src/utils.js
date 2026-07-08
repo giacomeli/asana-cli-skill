@@ -1,11 +1,11 @@
 /**
- * Extrai o task ID de uma URL do Asana ou retorna o ID direto.
+ * Extracts the task ID from an Asana URL, or returns the ID as-is.
  *
- * Formatos suportados:
+ * Supported formats:
  * - https://app.asana.com/0/<project-id>/<task-id>
  * - https://app.asana.com/0/<project-id>/<task-id>/f
  * - https://app.asana.com/1/<workspace-id>/project/<project-id>/task/<task-id>
- * - ID numérico direto
+ * - Plain numeric ID
  */
 export function parseTaskId(input) {
     if (/^\d+$/.test(input)) {
@@ -15,26 +15,26 @@ export function parseTaskId(input) {
     try {
         const url = new URL(input);
         if (!url.hostname.includes('asana.com')) {
-            throw new Error(`URL não é do Asana: ${input}`);
+            throw new Error(`URL is not an Asana URL: ${input}`);
         }
 
         const parts = url.pathname.split('/').filter(Boolean);
 
-        // Formato: /1/<workspace>/project/<project>/task/<task-id>
+        // Format: /1/<workspace>/project/<project>/task/<task-id>
         const taskIndex = parts.indexOf('task');
         if (taskIndex !== -1 && parts[taskIndex + 1]) {
             return parts[taskIndex + 1];
         }
 
-        // Formato: /0/<project-id>/<task-id>[/f]
+        // Format: /0/<project-id>/<task-id>[/f]
         if (parts[0] === '0' && parts.length >= 3) {
             return parts[2];
         }
 
-        throw new Error(`Não foi possível extrair task ID de: ${input}`);
+        throw new Error(`Could not extract a task ID from: ${input}`);
     } catch (err) {
         if (err.code === 'ERR_INVALID_URL') {
-            throw new Error(`Entrada inválida (não é URL nem ID numérico): ${input}`);
+            throw new Error(`Invalid input (not a URL or numeric ID): ${input}`);
         }
         throw err;
     }
