@@ -1,10 +1,22 @@
-# asana-cli
+<p align="center">
+  <img src="promo-assets/asana-cli-skill-readme-hero-1280x640.png" alt="asana-cli banner: Asana task management from your terminal, a minimal Node.js CLI that powers the asana skill for Claude Code" width="100%">
+</p>
 
-Minimal CLI for Asana task management. Built to power the `asana` skill for [Claude Code](https://claude.com/claude-code), but works standalone in any terminal.
+# asana-cli — Asana task management from your terminal
+
+**Minimal CLI for Asana task management. Built to power the `asana` skill for [Claude Code](https://claude.com/claude-code), but works standalone in any terminal.**
+
+[![npm version](https://img.shields.io/npm/v/asana-cli-skill)](https://www.npmjs.com/package/asana-cli-skill)
+[![node](https://img.shields.io/node/v/asana-cli-skill)](https://nodejs.org)
+[![license: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+
+`asana-cli` is a Node.js command-line tool for the [Asana API](https://developers.asana.com/reference): read tasks, list and create subtasks, add comments with attachments, and complete work — all from the terminal. It is the infrastructure layer behind the `asana` Claude Code skill, which lets an AI coding agent pick up an Asana task, build an implementation plan from its subtasks, and report progress back as the work advances.
 
 The CLI is a thin infrastructure layer over the Asana REST API. All orchestration logic (reading a task, generating a plan, executing steps, reporting progress) lives in the skill — see [The Claude Code skill](#the-claude-code-skill).
 
 ## Installation
+
+Install from [npm](https://www.npmjs.com/package/asana-cli-skill):
 
 ```bash
 npm install -g asana-cli-skill
