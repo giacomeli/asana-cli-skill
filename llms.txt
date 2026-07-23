@@ -1,0 +1,27 @@
+# asana-cli
+
+> Minimal Node.js CLI for Asana task management. Reads tasks, lists and creates subtasks, adds comments with attachments, and completes work against the Asana REST API. Built to power the `asana` skill for Claude Code, so AI coding agents can pick up an Asana task, plan from its subtasks, and report progress back — but it works standalone in any terminal.
+
+Install: `npm install -g asana-cli-skill` (or `npx asana-cli-skill <command>` with no install). Requires Node.js 18+ and an Asana Personal Access Token (`asana-cli init` to configure).
+
+Core commands:
+
+- `asana-cli task <url-or-id>` — read a full task (title, description, project, assignee, subtasks)
+- `asana-cli subtasks <url-or-id>` — list subtasks with completion state and IDs
+- `asana-cli create-subtask <parent-id> -n "name"` — create a subtask
+- `asana-cli comment <task-id> -m "message" [-a file]` — add a comment, optionally with attachments
+- `asana-cli complete <task-id> -m "message"` — comment and mark the task done (checkbox or a configured progress custom field)
+
+Accepts full Asana URLs (`https://app.asana.com/...`) or plain numeric task IDs. Output is human-readable plain text, designed to be pasted into plans and reports. Literal `\n` in messages becomes real line breaks.
+
+## Docs
+
+- [README](https://raw.githubusercontent.com/giacomeli/asana-cli-skill/main/README.md): installation, configuration, and full command reference
+- [Claude Code skill](https://raw.githubusercontent.com/giacomeli/asana-cli-skill/main/skills/asana/SKILL.md): agent workflow that orchestrates read task -> plan -> execute -> update Asana
+- [CONTRIBUTING](https://raw.githubusercontent.com/giacomeli/asana-cli-skill/main/CONTRIBUTING.md): project conventions and contribution guide
+
+## Links
+
+- [npm package](https://www.npmjs.com/package/asana-cli-skill)
+- [GitHub repository](https://github.com/giacomeli/asana-cli-skill)
+- [Asana API reference](https://developers.asana.com/reference)

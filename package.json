@@ -29,10 +29,19 @@
   },
   "keywords": [
     "asana",
+    "asana-api",
     "cli",
+    "command-line",
     "claude-code",
+    "claude-code-skill",
+    "agent-skill",
+    "ai-agents",
+    "coding-agent",
     "skill",
-    "task-management"
+    "task-management",
+    "automation",
+    "productivity",
+    "developer-tools"
   ],
   "dependencies": {
     "chalk": "^5.4.1",
